@@ -1,0 +1,429 @@
+#include <dos.h>
+#include <conio.h>
+#include <windows.h>
+#include <graphics.h>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include<mmsystem.h>
+#include <vector>;
+
+using namespace std;
+//void Continue();
+void help();
+void game();
+void check();
+void dead();
+void level();
+void high();
+void modified();
+void border();
+int snake_x[500],snake_y[500],snake_size = 5,score,highscore,spd = 100,l;
+bool checkdied = false,BONUS = false, new_game=false;
+main()
+{
+
+    int a = DETECT,b;  /* request autodetection */
+    initgraph(&a,&b,""); /* initialize graphics and local variables */
+
+    int cursor_y =130;
+    //setbkcolor(RED);
+    char ch;
+    while(1)
+    {
+
+        setcolor(RED);
+        //floodfill(1,1,BLUE);
+        //setbkcolor(GREEN);
+        settextstyle(3,0,8);
+        outtextxy(190,30,"Snake  ");
+        setcolor(WHITE);
+        settextstyle(3,0,2); /*this part prints menu again but inside while loop,because other functions will return here*/
+        //outtextxy(200,100,"Continue");
+        outtextxy(200,130,"Game");
+        outtextxy(200,160,"Help & Instruction");
+        outtextxy(200,190,"Select Level");
+        outtextxy(200,220,"Highscore");
+        outtextxy(200,250,"Credit");
+        outtextxy(200,280,"Exit");
+        outtextxy(160,cursor_y,"=>");
+        setcolor(YELLOW);
+        settextstyle(3,0,2);
+        outtextxy(200,310,"<<<Please Select Level First>>>");
+
+        if(kbhit){
+
+        ch = getch();
+
+
+        setcolor(BLACK);
+        outtextxy(160,cursor_y,"=>");
+        if(ch == 13) {
+             PlaySound(TEXT("sound4.wav"),NULL,SND_SYNC);
+            if(cursor_y==280) exit(0);
+            //else if(cursor_y==100) Continue;
+            else if(cursor_y==160) help();
+            else if(cursor_y==130)game();
+            else if(cursor_y==190) level();
+            else if(cursor_y==220) high();
+            else if(cursor_y==250) modified();
+        }
+
+        }
+        setcolor(GREEN);
+        if(ch==80)
+            {cursor_y=cursor_y+30;
+        if(cursor_y > 280) {cursor_y=130;}
+        }
+        if(ch==72)
+           {cursor_y=cursor_y-30;
+        if(cursor_y < 130) {cursor_y=280;}
+        }
+        //outtextxy(160,cursor_y,"=");
+    }
+
+    //return 0;
+}
+void help()
+{
+    clearviewport();
+    setcolor(WHITE);
+    outtextxy(130,130,"Move the snake using the Arrow keys.");
+    outtextxy(130,160,"Press 'Alt' button to Pause the game");
+    outtextxy(130,190,"The game will continue until Game Over.");
+    char ch = getch();
+    clearviewport();
+    return;
+}
+void modified()
+{
+    clearviewport();
+    setcolor(WHITE);
+     outtextxy(140,100,"Project:-'Snake Game'");
+    outtextxy(130,130,"Modified by Gourab Saha.");
+    outtextxy(130,160,"Registration No:2017831004");
+    outtextxy(190,220,"Submitted To");
+    outtextxy(130,250,"Mr. Asif Mohammed Samir");
+    outtextxy(160,280,"Assistant Professor");
+    char ch = getch();
+    clearviewport();
+    return;
+
+}
+void game()
+{
+    clearviewport();
+    freopen("GameData.dat","r",stdin);
+    cin >> highscore;
+
+    cleardevice();
+    char ch;
+    string key = "right";
+    int maxx = getmaxx()-12;//0
+    int maxy = getmaxy()-50;
+    int x =286,y =260;
+
+    int food_x = rand()%maxx,food_y = rand()%maxy;
+    int temp;
+    temp = food_x%13;
+    food_x-=temp;
+    temp = food_y%13;
+    food_y-=temp;
+    int i = 0,p=0;
+    int bonus = 500;
+
+    while(true)
+        {
+         //clearviewport();
+         //Sound(TEXT("sound3.wav"),NULL,SND_SYNC);
+         if(spd==100){new_game=false;}
+         if(new_game)
+        {
+            //setbkcolor(DARKGRAY);
+            setcolor(GREEN);
+            for(int k=0;k<=420;k=k+14)
+            {
+                line(0,k,610,k);
+            }
+
+            for(int k=12;k<=610;k=k+14)
+            {
+                line(k,0,k,420);
+            }
+            setcolor(BLUE);
+            line(2,0,2,maxy);
+            line(12,0,12,maxy);
+            for(int k=0;k<=maxy;k=k+1)
+            {
+                line(2,k,12,k);     //LEFT border
+            }
+            line(maxx-1,0,maxx-1,maxy);
+            line(maxx-11,0,maxx-11,maxy);
+            for(int k=0;k<maxy-10;k=k+1)
+            {
+                line(maxx-11,k,maxx-1,k);       //RIGHT  border
+            }
+            line(maxx-11,maxy-10,maxx-1,maxy-10);
+        }
+
+        if(score >0 && score%5==4) BONUS = true;
+        else{ bonus = 500;
+        BONUS = false;
+        }
+        if(!BONUS || bonus == 0){
+        setcolor(BLACK);
+        outtextxy(250,10,"Hurry!! 888");
+        setcolor(MAGENTA);
+        setfillstyle(SOLID_FILL,MAGENTA);
+        circle(food_x,food_y,5); //x position,y position,size
+        floodfill(food_x,food_y,MAGENTA);
+
+        }
+        else
+        {
+        setcolor(RED);
+        setfillstyle(SOLID_FILL,RED);
+        circle(food_x,food_y,7);
+        floodfill(food_x,food_y,RED);
+
+        char spp[1000];
+        setcolor(BLACK);
+        sprintf(spp,"Hurry!! %d",bonus);
+        outtextxy(250,10,"Hurry!! 888");
+        setcolor(YELLOW);
+        outtextxy(250,10,spp);
+        // clears
+        }
+        maxx = getmaxx()-12;//0
+        maxy = getmaxy()-50;
+        setcolor(WHITE);
+        line(0,maxy+8,maxx,maxy+8);
+        if(kbhit())
+        {
+            ch = getch(); if(ch == 0) ch = getch();
+            if(ch == 72 && key != "down" ) key = "up";
+            if(ch == 80 && key != "up") key = "down";
+            if(ch == 75 && key != "right") key = "left";
+            if(ch == 77 && key != "left") key = "right";
+            if(ch == 27) {
+            cleardevice();
+            return;
+        }
+
+        }
+
+        if(i < 5)
+        {
+            snake_x[i] = x-240;
+            snake_y[i] = y-285;
+            i++;
+        }
+        else {
+        for(int _size = snake_size-2;_size >= 0;_size--) {
+        snake_x[_size+1] = snake_x[_size];
+        snake_y[_size+1] = snake_y[_size];
+        }
+        snake_x[0] = x;
+        snake_y[0] = y;
+
+        setcolor(RED);
+        circle(snake_x[0],snake_y[0],8);
+        setfillstyle(SOLID_FILL,WHITE);
+        floodfill(snake_x[0],snake_y[0],RED);
+
+        setcolor(RED);
+        for(int _size = 1; _size < snake_size;_size++)
+        {
+        circle(snake_x[_size],snake_y[_size],5);
+        setfillstyle(SOLID_FILL,RED);
+        floodfill(snake_x[_size],snake_y[_size],RED);
+        }
+
+        char ara[100];
+        sprintf(ara,"Score: %d",score);
+        setcolor(WHITE);
+        outtextxy(00,maxy+10,ara);
+        sprintf(ara,"Bestscore: %d",highscore);
+        setcolor(WHITE);
+        outtextxy(450,maxy+10,ara);
+        sprintf(ara,"Exit:'Esc'");
+        setcolor(WHITE);
+        outtextxy(150,maxy+10,ara);
+          sprintf(ara,"Pause:'Alt'");
+        setcolor(WHITE);
+        outtextxy(300,maxy+10,ara);
+
+        delay(spd);
+
+        }
+        if(x == food_x && y== food_y)
+        {  PlaySound(TEXT("sound1.wav"),NULL,SND_ASYNC);
+        snake_size++;score++;
+            /* Snake eats food*/
+        if(score%5==0 && score>0)score+=bonus;
+
+        food_x = rand()%maxx,food_y = rand()%maxy;
+        temp = food_x%13;
+        food_x-=temp;
+        temp = food_y%13;
+        food_y-=temp;
+
+      if(food_x < 5 || food_x > maxx - 5 || food_y < 5 || food_y > maxy - 5 ||((food_x>=225 && food_x<=375) && ((food_y>=150 && food_y<=160)|| (food_y>=260 && food_y<=270))) )
+        {
+            while(food_x < 5 || food_x > maxx - 5 || food_y < 5 || food_y > maxy - 5 ||((food_x>=225 && food_x<=375) && ((food_y>=150 && food_y<=160)|| (food_y>=260 && food_y<=270)))) {
+            food_x = rand()%maxx,food_y = rand()%maxy;
+            temp = food_x%13;
+            food_x-=temp;
+            temp = food_y%13;
+            food_y-=temp;
+            }
+        }
+        }
+        if(key == "right") x = x+13; if(x > maxx) x =0;
+        if(key == "left") x = x-13; if(x < 0) x = maxx-(maxx%13);
+        if(key == "up") y = y-13; if(y > maxy) y = 0;
+        if(key == "down") y = y+13; if(y < 0) y = maxy-(maxy%13);
+        check();
+        if(checkdied){
+        dead();
+        return;
+        }
+
+    if(BONUS){
+    if(bonus>0)
+    bonus-=10;
+      }
+        setcolor(BLACK);
+        circle(snake_x[0],snake_y[0],8);
+        setfillstyle(SOLID_FILL,BLACK);
+        floodfill(snake_x[0],snake_y[0],BLACK);
+
+        for(int _size = 1; _size < snake_size;_size++)
+        {
+        circle(snake_x[_size],snake_y[_size],5);
+        setfillstyle(SOLID_FILL,BLACK);
+        floodfill(snake_x[_size],snake_y[_size],BLACK);
+        }
+    }
+
+}
+void check()
+{
+    freopen("GameData.dat","w",stdout);
+    if(highscore < score)
+    cout << score << endl;
+    else cout << highscore << endl;
+
+    for(int i = 1;i < snake_size;i++)
+    {
+        if(snake_x[0] == snake_x[i] && snake_y[0] == snake_y[i])
+        {
+            delay(1000);
+            setcolor(YELLOW);
+            for(int i = 0;i < snake_size;i++)
+            {
+                circle(snake_x[i],snake_y[i],5);
+                setfillstyle(SOLID_FILL,BLACK);
+                floodfill(snake_x[i],snake_y[i],WHITE);
+            }
+            while(1){
+            checkdied = true;
+            return;
+            }
+            }
+            }
+
+
+      if(new_game)
+            {
+            int maxx=getmaxx()-12;
+            //int maxy=getmaxy()-52;
+            if(snake_x[0]<=14 || snake_x[0] >= maxx-12 ) //////
+            {
+                while(1)
+                {
+                    checkdied=true;
+                        return;
+
+                }
+            }
+    }
+}
+void dead()
+{
+    checkdied = false;
+    snake_size = 5;
+    score = 0;
+    cleardevice();
+      setcolor(RED);
+    settextstyle(3,0,6);
+    outtextxy(180,180," GAME OVER ");
+    PlaySound(TEXT("soundb1.wav"),NULL,SND_SYNC);
+    delay(850);
+    clearviewport();
+}
+void level()
+{
+    clearviewport();
+    char ch;
+    char ara[100];
+    while(true){
+
+    int i = abs(spd/10-10);
+    sprintf(ara,"SELECT LEVEL : %d",i);
+    setcolor(WHITE);
+    outtextxy(180,150,ara);
+
+    if(kbhit())
+    {
+        ch = getch();
+
+        new_game=true;
+        if(ch == 80) {
+        spd-=10;
+        if(spd < 0) spd = 100;
+        }
+        else if(ch == 72) {
+            spd+=10;
+        if(spd > 100) spd = 0;
+        }
+        else if(ch == 13)
+            break;
+    sprintf(ara,"SELECT LEVEL : %d",i);
+    setcolor(BLACK);
+    outtextxy(180,150,ara);
+    }
+    }
+
+    clearviewport();
+}
+void high()
+{
+        clearviewport();
+        freopen("GameData.dat","r",stdin);
+        cin >> highscore;
+        char ara[100];
+        sprintf(ara,"Highscore: %d",highscore);
+        setcolor(WHITE);
+        outtextxy(200,150,ara);
+        char ch = getch();
+        clearviewport();
+}
+void border()
+    {
+
+            if((snake_y[0]>=150 && snake_y[0]<=160) || (snake_y[0]>=260 && snake_y[0]<=270))
+            {
+                 while(1)
+                {
+                    checkdied=true;
+                    return;
+
+
+
+                }
+            }
+
+}
+
+
