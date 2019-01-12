@@ -6,7 +6,7 @@
 
 ### About
 
-It's a modified snake game. In this game, there are many level.In different levels you get different level of speeds. Moreover you get to different type of structure.   
+It's a modified snake game. In this game, there are many levels.In different levels you get different level of speeds. Moreover you get to different type of structure.   
 
 ### Resources:
 "C"
