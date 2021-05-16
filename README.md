@@ -1,6 +1,6 @@
 # Snake Game
 
-### Project-1|SWE-1/2
+### Project-1 || (1st year/ 2nd Semester)
 
 [Gourab Saha](https://github.com/Manstein2017831004)- 2017831004
 
